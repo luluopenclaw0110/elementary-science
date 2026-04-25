@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>太空探索 - 自然科學</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="cosmic-bg space" id="cosmicBg"></div>
+    
+    <header class="header">
+        <div class="header-content">
+            <a href="../index.html" class="back-btn">← 返回首頁</a>
+            <div class="header-right">
+                <div class="stars-counter">
+                    <span class="star-icon">⭐</span>
+                    <span id="totalStars">0</span> 星星
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <section class="page-header">
+            <h1 class="page-title">🌌 太空探索</h1>
+            <p class="page-subtitle">探索太陽系、星座和月亮的秘密！</p>
+        </section>
+
+        <section class="units-grid">
+            <!-- 單元1：太陽系 -->
+            <div class="unit-card" id="unit-space-1">
+                <div class="unit-header">
+                    <span class="unit-number">單元 1</span>
+                    <span class="unit-status" id="status-space-1">☆</span>
+                </div>
+                <h3 class="unit-title">🚀 太陽系冒險</h3>
+                <p class="unit-desc">拖曳行星到正確位置，認識八大行星！</p>
+                <button class="unit-play-btn" onclick="openGame('solar-system')">開始遊戲</button>
+            </div>
+
+            <!-- 單元2：星座認知 -->
+            <div class="unit-card" id="unit-space-2">
+                <div class="unit-header">
+                    <span class="unit-number">單元 2</span>
+                    <span class="unit-status" id="status-space-2">☆</span>
+                </div>
+                <h3 class="unit-title">✨ 星座配對</h3>
+                <p class="unit-desc">點擊星座圖案，學習十二星座！</p>
+                <button class="unit-play-btn" onclick="openGame('constellation')">開始遊戲</button>
+            </div>
+
+            <!-- 單元3：月相變化 -->
+            <div class="unit-card" id="unit-space-3">
+                <div class="unit-header">
+                    <span class="unit-number">單元 3</span>
+                    <span class="unit-status" id="status-space-3">☆</span>
+                </div>
+                <h3 class="unit-title">🌙 月相變化</h3>
+                <p class="unit-desc">拖動月亮，觀察月相的變化！</p>
+                <button class="unit-play-btn" onclick="openGame('moon-phase')">開始遊戲</button>
+            </div>
+        </section>
+    </main>
+
+    <!-- 遊戲彈窗 -->
+    <div class="game-modal" id="gameModal">
+        <div class="game-container" id="gameContent">
+            <!-- 遊戲內容會動態載入 -->
+        </div>
+    </div>
+
+    <script src="../js/main.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            ScienceGame.loadProgress();
+            ScienceGame.updateTotalStars();
+        });
+
+        function openGame(gameType) {
+            const modal = document.getElementById('gameModal');
+            const content = document.getElementById('gameContent');
+            
+            let gameHTML = '';
+            
+            switch(gameType) {
+                case 'solar-system':
+                    gameHTML = createSolarSystemGame();
+                    break;
+                case 'constellation':
+                    gameHTML = createConstellationGame();
+                    break;
+                case 'moon-phase':
+                    gameHTML = createMoonPhaseGame();
+                    break;
+            }
+            
+            content.innerHTML = gameHTML;
+            modal.style.display = 'block';
+            
+            // 初始化遊戲
+            if (gameType === 'solar-system') initSolarSystemGame();
+            if (gameType === 'constellation') initConstellationGame();
+            if (gameType === 'moon-phase') initMoonPhaseGame();
+        }
+
+        function closeGame() {
+            document.getElementById('gameModal').style.display = 'none';
+        }
+
+        // ===== 太陽系遊戲 =====
+        function createSolarSystemGame() {
+            return `
+                <h2 class="game-title">🚀 太陽系八大行星</h2>
+                <p class="game-instructions">把行星拖到正確的軌道位置上！</p>
+                <div id="solar-system-game" style="position: relative; height: 400px; background: radial-gradient(circle at center, #ffd700 0%, #ff8c00 20%, transparent 40%), #0a0a20; border-radius: 20px; overflow: hidden;">
+                    <div id="sun" style="position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); font-size: 4rem;">☀️</div>
+                    <div id="planets-container"></div>
+                    <div id="orbits-info" style="position: absolute; bottom: 10px; left: 10px; color: white; font-size: 0.9rem;"></div>
+                </div>
+                <div id="planet-tray" style="display: flex; justify-content: center; gap: 10px; margin-top: 20px; flex-wrap: wrap;"></div>
+                <button class="unit-play-btn" style="margin-top: 20px; background: #e74c3c;" onclick="closeGame()">關閉</button>
+            `;
+        }
+
+        function initSolarSystemGame() {
+            const planets = [
+                { name: '水星', emoji: '🤍', color: '#b5b5b5', orbit: 60 },
+                { name: '金星', emoji: '🟡', color: '#e6c87a', orbit: 90 },
+                { name: '地球', emoji: '🔵', color: '#6b93d6', orbit: 120 },
+                { name: '火星', emoji: '🔴', color: '#c1440e', orbit: 150 },
+                { name: '木星', emoji: '🟤', color: '#d8ca9d', orbit: 190 },
+                { name: '土星', emoji: '🟠', color: '#f4d59e', orbit: 230 },
+                { name: '天王星', emoji: '🔵', color: '#d1e7e7', orbit: 270 },
+                { name: '海王星', emoji: '🔵', color: '#5b5ddf', orbit: 310 }
+            ];
+
+            const tray = document.getElementById('planet-tray');
+            const container = document.getElementById('planets-container');
+            const orbitsInfo = document.getElementById('orbits-info');
+
+            let placedCount = 0;
+
+            // 亂序排列行星
+            const shuffled = ScienceGame.shuffle(planets);
+
+            shuffled.forEach((planet, index) => {
+                const planetEl = document.createElement('div');
+                planetEl.className = 'planet';
+                planetEl.dataset.name = planet.name;
+                planetEl.dataset.order = index;
+                planetEl.style.cssText = `
+                    width: 50px; height: 50px; border-radius: 50%;
+                    background: ${planet.color}; cursor: grab;
+                    display: flex; align-items: center; justify-content: center;
+                    font-size: 1.8rem; position: relative;
+                    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+                `;
+                planetEl.innerHTML = planet.emoji;
+                
+                ScienceGame.enableDrag(planetEl, (el) => {
+                    const sun = document.getElementById('sun');
+                    const sunRect = sun.getBoundingClientRect();
+                    const elRect = el.getBoundingClientRect();
+                    const gameRect = document.getElementById('solar-system-game').getBoundingClientRect();
+                    
+                    const centerX = sunRect.left + sunRect.width/2;
+                    const centerY = sunRect.top + sunRect.height/2;
+                    const elCenterX = elRect.left + elRect.width/2;
+                    const elCenterY = elRect.top + elRect.height/2;
+                    
+                    const distance = Math.sqrt(Math.pow(centerX - elCenterX, 2) + Math.pow(centerY - elCenterY, 2));
+                    
+                    const expectedOrder = planets.findIndex(p => p.name === el.dataset.name);
+                    const expectedDistance = planets[expectedOrder].orbit;
+                    
+                    // 計算與預期距離的誤差
+                    const error = Math.abs(distance - expectedDistance);
+                    
+                    if (error < 50) {
+                        el.style.left = (parseFloat(el.style.left) || elRect.left - gameRect.left) + 'px';
+                        el.style.top = (parseFloat(el.style.top) || elRect.top - gameRect.top) + 'px';
+                        el.style.position = 'absolute';
+                        el.style.cursor = 'default';
+                        placedCount++;
+                        
+                        if (placedCount === 8) {
+                            setTimeout(() => {
+                                completeAndClose('space-1');
+                            }, 500);
+                        }
+                    }
+                });
+                
+                tray.appendChild(planetEl);
+            });
+
+            // 繪製軌道線
+            planets.forEach(planet => {
+                const orbit = document.createElement('div');
+                orbit.style.cssText = `
+                    position: absolute; left: 50%; top: 50%;
+                    transform: translate(-50%, -50%);
+                    width: ${planet.orbit * 2}px; height: ${planet.orbit * 2}px;
+                    border: 1px dashed rgba(255,255,255,0.2); border-radius: 50%;
+                    pointer-events: none;
+                `;
+                container.appendChild(orbit);
+            });
+
+            orbitsInfo.innerHTML = '📍 將行星拖放到正確的軌道位置';
+        }
+
+        // ===== 星座配對遊戲 =====
+        function createConstellationGame() {
+            const constellations = [
+                { name: '牡羊座', emoji: '♈', stars: '● ● ●' },
+                { name: '金牛座', emoji: '♉', stars: '● ● ●' },
+                { name: '雙子座', emoji: '♊', stars: '● ●' },
+                { name: '巨蟹座', emoji: '♋', stars: '● ● ●' },
+                { name: '獅子座', emoji: '♌', stars: '● ● ●' },
+                { name: '處女座', emoji: '♍', stars: '● ● ●' },
+                { name: '天秤座', emoji: '♎', stars: '● ●' },
+                { name: '天蠍座', emoji: '♏', stars: '● ● ●' },
+                { name: '射手座', emoji: '♐', stars: '● ●' },
+                { name: '摩羯座', emoji: '♑', stars: '● ● ●' },
+                { name: '水瓶座', emoji: '♒', stars: '● ●' },
+                { name: '雙魚座', emoji: '♓', stars: '● ● ●' }
+            ];
+            
+            const shuffled = ScienceGame.shuffle(constellations).slice(0, 6);
+            
+            return `
+                <h2 class="game-title">✨ 星座配對挑戰</h2>
+                <p class="game-instructions">點擊星座符號，找出它的名字！答對6題過關！</p>
+                <div id="constellation-game" style="padding: 20px;">
+                    <div style="display: flex; flex-wrap: wrap; gap: 15px; justify-content: center;" id="constellation-cards"></div>
+                    <div style="margin-top: 20px; text-align: center;">
+                        <p id="constellation-question" style="font-size: 1.5rem; margin-bottom: 15px;">?</p>
+                        <div id="constellation-answers" style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;"></div>
+                    </div>
+                    <div id="constellation-score" style="text-align: center; margin-top: 20px; font-size: 1.2rem;">得分：0 / 6</div>
+                </div>
+                <button class="unit-play-btn" style="margin-top: 20px; background: #e74c3c;" onclick="closeGame()">關閉</button>
+            `;
+        }
+
+        function initConstellationGame() {
+            const constellations = [
+                { name: '牡羊座', emoji: '♈' },
+                { name: '金牛座', emoji: '♉' },
+                { name: '雙子座', emoji: '♊' },
+                { name: '巨蟹座', emoji: '♋' },
+                { name: '獅子座', emoji: '♌' },
+                { name: '處女座', emoji: '♍' },
+                { name: '天秤座', emoji: '♎' },
+                { name: '天蠍座', emoji: '♏' },
+                { name: '射手座', emoji: '♐' },
+                { name: '摩羯座', emoji: '♑' },
+                { name: '水瓶座', emoji: '♒' },
+                { name: '雙魚座', emoji: '♓' }
+            ];
+            
+            let currentIndex = 0;
+            let score = 0;
+            const shuffled = ScienceGame.shuffle(constellations).slice(0, 6);
+            
+            const cardsContainer = document.getElementById('constellation-cards');
+            const questionEl = document.getElementById('constellation-question');
+            const answersEl = document.getElementById('constellation-answers');
+            const scoreEl = document.getElementById('constellation-score');
+            
+            function showQuestion() {
+                if (currentIndex >= shuffled.length) {
+                    scoreEl.innerHTML = `<span style="color: #27ae60; font-size: 1.5rem;">🎉 挑戰完成！得分：${score} / ${shuffled.length}</span>`;
+                    if (score >= 6) {
+                        setTimeout(() => completeAndClose('space-2'), 1000);
+                    }
+                    return;
+                }
+                
+                const current = shuffled[currentIndex];
+                questionEl.textContent = current.emoji;
+                questionEl.style.fontSize = '3rem';
+                
+                const answerOptions = ScienceGame.shuffle(constellations.filter(c => c.name !== current.name).slice(0, 3)).concat(current);
+                const shuffledAnswers = ScienceGame.shuffle(answerOptions);
+                
+                answersEl.innerHTML = '';
+                shuffledAnswers.forEach(c => {
+                    const btn = document.createElement('button');
+                    btn.className = 'unit-play-btn';
+                    btn.style.width = 'auto';
+                    btn.style.padding = '0.8rem 1.5rem';
+                    btn.textContent = c.name;
+                    btn.onclick = () => {
+                        if (c.name === current.name) {
+                            score++;
+                            questionEl.innerHTML = '<span style="color: #27ae60;">✓ 正確！</span>';
+                        } else {
+                            questionEl.innerHTML = `<span style="color: #e74c3c;">✗ 正確答案是：${current.name}</span>`;
+                        }
+                        scoreEl.textContent = `得分：${score} / ${shuffled.length}`;
+                        setTimeout(() => {
+                            currentIndex++;
+                            showQuestion();
+                        }, 1000);
+                    };
+                    answersEl.appendChild(btn);
+                });
+            }
+            
+            showQuestion();
+        }
+
+        // ===== 月相遊戲 =====
+        function createMoonPhaseGame() {
+            return `
+                <h2 class="game-title">🌙 月相變化</h2>
+                <p class="game-instructions">拖動月亮，體驗一個月內月相的變化！完成所有月相後過關！</p>
+                <div id="moon-phase-game" style="text-align: center; padding: 20px;">
+                    <div style="background: linear-gradient(to bottom, #0a0a30 0%, #1a1a60 100%); border-radius: 20px; padding: 40px; position: relative;">
+                        <div id="moon-view" style="font-size: 8rem; margin: 20px 0; transition: all 0.5s;">🌑</div>
+                        <div id="moon-label" style="color: white; font-size: 1.5rem; margin-bottom: 20px;">新月</div>
+                        <input type="range" id="moon-slider" min="0" max="7" value="0" style="width: 80%;">
+                        <div style="display: flex; justify-content: space-between; color: white; font-size: 0.9rem; margin-top: 10px;">
+                            <span>初一</span><span>初八</span><span>十五</span><span>廿二</span><span>三十</span>
+                        </div>
+                    </div>
+                    <div id="moon-sequence" style="display: flex; justify-content: center; gap: 10px; margin-top: 20px; flex-wrap: wrap;"></div>
+                    <button class="unit-play-btn" style="margin-top: 20px; background: #e74c3c;" onclick="closeGame()">關閉</button>
+                </div>
+            `;
+        }
+
+        function initMoonPhaseGame() {
+            const phases = [
+                { emoji: '🌑', name: '新月', day: '初一' },
+                { emoji: '🌒', name: '眉月', day: '初三' },
+                { emoji: '🌓', name: '上弦月', day: '初八' },
+                { emoji: '🌔', name: '盈月', day: '十二' },
+                { emoji: '🌕', name: '滿月', day: '十五' },
+                { emoji: '🌖', name: '虧月', day: '十八' },
+                { emoji: '🌗', name: '下弦月', day: '廿二' },
+                { emoji: '🌘', name: '殘月', day: '廿五' }
+            ];
+            
+            const slider = document.getElementById('moon-slider');
+            const moonView = document.getElementById('moon-view');
+            const moonLabel = document.getElementById('moon-label');
+            const sequence = document.getElementById('moon-sequence');
+            
+            let visitedPhases = new Set();
+            
+            // 顯示月相序列
+            phases.forEach((phase, i) => {
+                const span = document.createElement('span');
+                span.textContent = phase.emoji;
+                span.style.cssText = 'font-size: 2rem; opacity: 0.3; cursor: pointer;';
+                span.onclick = () => {
+                    slider.value = i;
+                    updateMoon(i);
+                };
+                sequence.appendChild(span);
+            });
+            
+            function updateMoon(index) {
+                const phase = phases[index];
+                moonView.textContent = phase.emoji;
+                moonLabel.textContent = `${phase.name} (${phase.day})`;
+                visitedPhases.add(index);
+                
+                // 高亮當前
+                sequence.children[index].style.opacity = '1';
+                sequence.children[index].style.transform = 'scale(1.3)';
+                
+                // 檢查是否完成所有月相
+                if (visitedPhases.size === phases.length) {
+                    setTimeout(() => completeAndClose('space-3'), 500);
+                }
+            }
+            
+            slider.oninput = () => updateMoon(parseInt(slider.value));
+        }
+
+        function completeAndClose(unitId) {
+            ScienceGame.completeUnit(unitId, 'space');
+            closeGame();
+        }
+    </script>
+    <style>
+        .game-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.9);
+            z-index: 200;
+            overflow-y: auto;
+            padding: 20px;
+        }
+    </style>
+</body>
+</html>

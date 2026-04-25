@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>自然科學探索 - 互動學習網站</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- 背景星空 -->
+    <div class="cosmic-bg" id="cosmicBg">
+        <div class="star"></div><div class="star"></div><div class="star"></div>
+        <div class="star"></div><div class="star"></div><div class="star"></div>
+        <div class="star"></div><div class="star"></div><div class="star"></div>
+        <div class="star"></div><div class="star"></div><div class="star"></div>
+        <div class="star"></div><div class="star"></div><div class="star"></div>
+        <div class="star"></div><div class="star"></div><div class="star"></div>
+        <div class="star"></div><div class="star"></div><div class="star"></div>
+        <div class="star"></div><div class="star"></div><div class="star"></div>
+        <div class="star"></div><div class="star"></div><div class="star"></div>
+        <div class="star"></div><div class="star"></div><div class="star"></div>
+    </div>
+
+    <!-- 頂部導航列 -->
+    <header class="header">
+        <div class="header-content">
+            <h1 class="logo">🔬 自然科學探索</h1>
+            <div class="header-right">
+                <div class="stars-counter">
+                    <span class="star-icon">⭐</span>
+                    <span id="totalStars">0</span> 星星
+                </div>
+                <button class="mute-btn" id="muteBtn" title="安靜模式">
+                    🔊
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- 主內容 -->
+    <main class="main-content">
+        <section class="hero">
+            <h2 class="hero-title">歡迎來到自然科學的世界！</h2>
+            <p class="hero-subtitle">點選下方卡片，展開你的科學探索之旅</p>
+        </section>
+
+        <section class="categories-grid">
+            <!-- 太空探索 -->
+            <a href="pages/space.html" class="category-card space-card">
+                <div class="card-icon">🌌</div>
+                <h3 class="card-title">太空探索</h3>
+                <p class="card-desc">太陽系、星座、月相</p>
+                <div class="card-stars">
+                    <span class="unit-star" data-unit="space-1">☆</span>
+                    <span class="unit-star" data-unit="space-2">☆</span>
+                    <span class="unit-star" data-unit="space-3">☆</span>
+                </div>
+                <div class="card-badge" id="badge-space"></div>
+            </a>
+
+            <!-- 恐龍世界 -->
+            <a href="pages/dinosaur.html" class="category-card dino-card">
+                <div class="card-icon">🦖</div>
+                <h3 class="card-title">恐龍世界</h3>
+                <p class="card-desc">恐龍種類、時間軸、滅絕之謎</p>
+                <div class="card-stars">
+                    <span class="unit-star" data-unit="dino-1">☆</span>
+                    <span class="unit-star" data-unit="dino-2">☆</span>
+                    <span class="unit-star" data-unit="dino-3">☆</span>
+                </div>
+                <div class="card-badge" id="badge-dino"></div>
+            </a>
+
+            <!-- 人體奧秘 -->
+            <a href="pages/body.html" class="category-card body-card">
+                <div class="card-icon">🫀</div>
+                <h3 class="card-title">人體奧秘</h3>
+                <p class="card-desc">器官、消化、循環系統</p>
+                <div class="card-stars">
+                    <span class="unit-star" data-unit="body-1">☆</span>
+                    <span class="unit-star" data-unit="body-2">☆</span>
+                    <span class="unit-star" data-unit="body-3">☆</span>
+                </div>
+                <div class="card-badge" id="badge-body"></div>
+            </a>
+
+            <!-- 地球科學 -->
+            <a href="pages/earth.html" class="category-card earth-card">
+                <div class="card-icon">🌋</div>
+                <h3 class="card-title">地球科學</h3>
+                <p class="card-desc">天氣、火山、水循環</p>
+                <div class="card-stars">
+                    <span class="unit-star" data-unit="earth-1">☆</span>
+                    <span class="unit-star" data-unit="earth-2">☆</span>
+                    <span class="unit-star" data-unit="earth-3">☆</span>
+                </div>
+                <div class="card-badge" id="badge-earth"></div>
+            </a>
+
+            <!-- 海洋世界 -->
+            <a href="pages/ocean.html" class="category-card ocean-card">
+                <div class="card-icon">🌊</div>
+                <h3 class="card-title">海洋世界</h3>
+                <p class="card-desc">魚類、海底、珊瑚礁</p>
+                <div class="card-stars">
+                    <span class="unit-star" data-unit="ocean-1">☆</span>
+                    <span class="unit-star" data-unit="ocean-2">☆</span>
+                    <span class="unit-star" data-unit="ocean-3">☆</span>
+                </div>
+                <div class="card-badge" id="badge-ocean"></div>
+            </a>
+        </section>
+    </main>
+
+    <!-- 成就彈窗 -->
+    <div class="badge-popup" id="badgePopup">
+        <div class="badge-popup-content">
+            <div class="badge-icon" id="popupBadgeIcon">🏆</div>
+            <h3>恭喜獲得成就！</h3>
+            <p id="popupBadgeName"></p>
+            <button class="popup-close" onclick="closeBadgePopup()">太棒了！</button>
+        </div>
+    </div>
+
+    <script src="js/main.js"></script>
+    <script>
+        // 初始化頁面
+        document.addEventListener('DOMContentLoaded', () => {
+            loadProgress();
+            updateTotalStars();
+        });
+    </script>
+</body>
+</html>

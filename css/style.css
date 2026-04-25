@@ -1,0 +1,474 @@
+/* ===== 全域設定 ===== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --space-bg: linear-gradient(135deg, #0c1445 0%, #1a0a3e 50%, #0d0d2b 100%);
+    --dino-bg: linear-gradient(135deg, #2d5016 0%, #1a3a0a 50%, #1a2f0a 100%);
+    --body-bg: linear-gradient(135deg, #8b0000 0%, #5c0000 50%, #3d0000 100%);
+    --earth-bg: linear-gradient(135deg, #8b4513 0%, #654321 50%, #3d2914 100%);
+    --ocean-bg: linear-gradient(135deg, #006994 0%, #004466 50%, #002244 100%);
+    --card-bg: rgba(255, 255, 255, 0.95);
+    --text-dark: #1a1a2e;
+    --text-light: #ffffff;
+    --primary: #6c5ce7;
+    --secondary: #a29bfe;
+    --accent: #fd79a8;
+    --gold: #feca57;
+    --success: #00b894;
+}
+
+body {
+    font-family: 'Noto Sans TC', sans-serif;
+    min-height: 100vh;
+    background: var(--space-bg);
+    color: var(--text-light);
+    overflow-x: hidden;
+}
+
+/* ===== 背景星空 ===== */
+.cosmic-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    background: var(--space-bg);
+    overflow: hidden;
+}
+
+.cosmic-bg.dino { background: var(--dino-bg); }
+.cosmic-bg.body { background: var(--body-bg); }
+.cosmic-bg.earth { background: var(--earth-bg); }
+.cosmic-bg.ocean { background: var(--ocean-bg); }
+
+.star {
+    position: absolute;
+    background: white;
+    border-radius: 50%;
+    animation: twinkle 2s infinite ease-in-out;
+}
+
+@keyframes twinkle {
+    0%, 100% { opacity: 0.3; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.2); }
+}
+
+/* ===== 頂部導航 ===== */
+.header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    background: rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(10px);
+    padding: 1rem 2rem;
+}
+
+.header-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    font-size: 1.5rem;
+    font-weight: 900;
+    text-shadow: 0 0 20px rgba(108, 92, 231, 0.5);
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.stars-counter {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.2rem;
+    font-weight: 700;
+}
+
+.star-icon {
+    font-size: 1.5rem;
+    animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+
+.mute-btn {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 1.2rem;
+    transition: all 0.3s;
+}
+
+.mute-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: scale(1.05);
+}
+
+/* ===== 主內容 ===== */
+.main-content {
+    padding: 120px 2rem 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* ===== 英雄區 ===== */
+.hero {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.hero-title {
+    font-size: 3rem;
+    font-weight: 900;
+    margin-bottom: 1rem;
+    background: linear-gradient(135deg, #fff 0%, #a29bfe 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-shadow: none;
+}
+
+.hero-subtitle {
+    font-size: 1.3rem;
+    opacity: 0.9;
+}
+
+/* ===== 分類卡片 ===== */
+.categories-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2rem;
+    padding: 1rem;
+}
+
+.category-card {
+    position: relative;
+    background: var(--card-bg);
+    border-radius: 24px;
+    padding: 2.5rem 2rem;
+    text-decoration: none;
+    color: var(--text-dark);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    overflow: hidden;
+}
+
+.category-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, transparent 0%, rgba(255,255,255,0.3) 100%);
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.category-card:hover {
+    transform: translateY(-10px) scale(1.02);
+    box-shadow: 0 20px 60px rgba(108, 92, 231, 0.4);
+}
+
+.category-card:hover::before {
+    opacity: 1;
+}
+
+/* 各分類卡片專屬顏色 */
+.space-card:hover { box-shadow: 0 20px 60px rgba(108, 92, 231, 0.4); }
+.dino-card:hover { box-shadow: 0 20px 60px rgba(46, 213, 115, 0.4); }
+.body-card:hover { box-shadow: 0 20px 60px rgba(255, 107, 107, 0.4); }
+.earth-card:hover { box-shadow: 0 20px 60px rgba(255, 159, 67, 0.4); }
+.ocean-card:hover { box-shadow: 0 20px 60px rgba(0, 150, 199, 0.4); }
+
+.card-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+}
+
+.card-title {
+    font-size: 1.8rem;
+    font-weight: 900;
+    margin-bottom: 0.5rem;
+    color: var(--text-dark);
+}
+
+.card-desc {
+    font-size: 1rem;
+    opacity: 0.7;
+    margin-bottom: 1rem;
+}
+
+.card-stars {
+    display: flex;
+    gap: 0.5rem;
+    font-size: 1.5rem;
+}
+
+.unit-star {
+    transition: all 0.3s;
+    cursor: default;
+}
+
+.unit-star.earned {
+    color: var(--gold);
+    text-shadow: 0 0 10px var(--gold);
+    animation: starEarned 0.5s ease-out;
+}
+
+@keyframes starEarned {
+    0% { transform: scale(0) rotate(-180deg); }
+    100% { transform: scale(1) rotate(0deg); }
+}
+
+.card-badge {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    font-size: 2rem;
+    opacity: 0;
+    transform: scale(0);
+    transition: all 0.5s;
+}
+
+.card-badge.unlocked {
+    opacity: 1;
+    transform: scale(1);
+    animation: badgeUnlock 0.8s ease-out;
+}
+
+@keyframes badgeUnlock {
+    0% { transform: scale(0) rotate(-360deg); }
+    50% { transform: scale(1.3) rotate(10deg); }
+    100% { transform: scale(1) rotate(0deg); }
+}
+
+/* ===== 子頁面 ===== */
+.page-header {
+    padding: 100px 2rem 2rem;
+    text-align: center;
+}
+
+.back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: white;
+    text-decoration: none;
+    font-size: 1.1rem;
+    margin-bottom: 2rem;
+    padding: 0.5rem 1rem;
+    background: rgba(255,255,255,0.1);
+    border-radius: 20px;
+    transition: all 0.3s;
+}
+
+.back-btn:hover {
+    background: rgba(255,255,255,0.2);
+    transform: translateX(-5px);
+}
+
+.page-title {
+    font-size: 2.5rem;
+    font-weight: 900;
+    margin-bottom: 0.5rem;
+}
+
+.page-subtitle {
+    font-size: 1.2rem;
+    opacity: 0.8;
+}
+
+/* ===== 單元卡片 ===== */
+.units-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+.unit-card {
+    background: var(--card-bg);
+    border-radius: 20px;
+    padding: 2rem;
+    color: var(--text-dark);
+    transition: all 0.3s;
+    cursor: pointer;
+}
+
+.unit-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+}
+
+.unit-card.locked {
+    opacity: 0.6;
+    filter: grayscale(50%);
+}
+
+.unit-card.completed {
+    border: 3px solid var(--success);
+}
+
+.unit-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+}
+
+.unit-number {
+    background: var(--primary);
+    color: white;
+    padding: 0.3rem 0.8rem;
+    border-radius: 15px;
+    font-size: 0.9rem;
+    font-weight: 700;
+}
+
+.unit-status {
+    font-size: 1.5rem;
+}
+
+.unit-title {
+    font-size: 1.5rem;
+    font-weight: 900;
+    margin-bottom: 0.5rem;
+}
+
+.unit-desc {
+    font-size: 1rem;
+    opacity: 0.7;
+    margin-bottom: 1rem;
+}
+
+.unit-play-btn {
+    width: 100%;
+    padding: 1rem;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+    color: white;
+    border: none;
+    border-radius: 15px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-family: inherit;
+}
+
+.unit-play-btn:hover {
+    transform: scale(1.02);
+    box-shadow: 0 5px 20px rgba(108, 92, 231, 0.4);
+}
+
+/* ===== 遊戲區域 ===== */
+.game-area {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+.game-container {
+    background: var(--card-bg);
+    border-radius: 24px;
+    padding: 2rem;
+    color: var(--text-dark);
+}
+
+.game-title {
+    font-size: 1.8rem;
+    font-weight: 900;
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+.game-instructions {
+    text-align: center;
+    font-size: 1.1rem;
+    margin-bottom: 2rem;
+    opacity: 0.8;
+}
+
+/* ===== 彈窗 ===== */
+.badge-popup {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.8);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.badge-popup.show {
+    display: flex;
+}
+
+.badge-popup-content {
+    background: white;
+    border-radius: 30px;
+    padding: 3rem;
+    text-align: center;
+    color: var(--text-dark);
+    animation: popupIn 0.5s ease-out;
+}
+
+@keyframes popupIn {
+    0% { transform: scale(0) rotate(-10deg); opacity: 0; }
+    100% { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+
+.badge-icon {
+    font-size: 5rem;
+    margin-bottom: 1rem;
+}
+
+.popup-close {
+    margin-top: 1.5rem;
+    padding: 1rem 2.5rem;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+    color: white;
+    border: none;
+    border-radius: 25px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.3s;
+}
+
+.popup-close:hover {
+    transform: scale(1.05);
+}
+
+/* ===== 響應式 ===== */
+@media (max-width: 768px) {
+    .hero-title { font-size: 2rem; }
+    .categories-grid { grid-template-columns: 1fr; }
+    .units-grid { grid-template-columns: 1fr; }
+    .header { padding: 1rem; }
+    .logo { font-size: 1.2rem; }
+}

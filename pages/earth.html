@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>地球科學 - 自然科學</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="cosmic-bg earth" id="cosmicBg"></div>
+    
+    <header class="header">
+        <div class="header-content">
+            <a href="../index.html" class="back-btn">← 返回首頁</a>
+            <div class="header-right">
+                <div class="stars-counter">
+                    <span class="star-icon">⭐</span>
+                    <span id="totalStars">0</span> 星星
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <section class="page-header">
+            <h1 class="page-title">🌋 地球科學</h1>
+            <p class="page-subtitle">探索天氣、火山和水循環的奧秘！</p>
+        </section>
+
+        <section class="units-grid">
+            <!-- 單元1：天氣變化 -->
+            <div class="unit-card" id="unit-earth-1">
+                <div class="unit-header">
+                    <span class="unit-number">單元 1</span>
+                    <span class="unit-status" id="status-earth-1">☆</span>
+                </div>
+                <h3 class="unit-title">⛅ 天氣實驗室</h3>
+                <p class="unit-desc">認識各種天氣現象，製作自己的天氣！</p>
+                <button class="unit-play-btn" onclick="openGame('weather')">開始遊戲</button>
+            </div>
+
+            <!-- 單元2：火山構造 -->
+            <div class="unit-card" id="unit-earth-2">
+                <div class="unit-header">
+                    <span class="unit-number">單元 2</span>
+                    <span class="unit-status" id="status-earth-2">☆</span>
+                </div>
+                <h3 class="unit-title">🌋 火山爆發模擬</h3>
+                <p class="unit-desc">觀察火山爆發的原理，體驗科學實驗！</p>
+                <button class="unit-play-btn" onclick="openGame('volcano')">開始遊戲</button>
+            </div>
+
+            <!-- 單元3：水循環 -->
+            <div class="unit-card" id="unit-earth-3">
+                <div class="unit-header">
+                    <span class="unit-number">單元 3</span>
+                    <span class="unit-status" id="status-earth-3">☆</span>
+                </div>
+                <h3 class="unit-title">💧 水循環動畫</h3>
+                <p class="unit-desc">跟著水滴一起經歷水循環的旅程！</p>
+                <button class="unit-play-btn" onclick="openGame('water-cycle')">開始遊戲</button>
+            </div>
+        </section>
+    </main>
+
+    <div class="game-modal" id="gameModal">
+        <div class="game-container" id="gameContent"></div>
+    </div>
+
+    <script src="../js/main.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            ScienceGame.loadProgress();
+            ScienceGame.updateTotalStars();
+        });
+
+        function openGame(gameType) {
+            const modal = document.getElementById('gameModal');
+            const content = document.getElementById('gameContent');
+            let gameHTML = '';
+            
+            switch(gameType) {
+                case 'weather':
+                    gameHTML = createWeatherGame();
+                    break;
+                case 'volcano':
+                    gameHTML = createVolcanoGame();
+                    break;
+                case 'water-cycle':
+                    gameHTML = createWaterCycleGame();
+                    break;
+            }
+            
+            content.innerHTML = gameHTML;
+            modal.style.display = 'block';
+            
+            if (gameType === 'weather') initWeatherGame();
+            if (gameType === 'volcano') initVolcanoGame();
+            if (gameType === 'water-cycle') initWaterCycleGame();
+        }
+
+        function closeGame() {
+            document.getElementById('gameModal').style.display = 'none';
+        }
+
+        // ===== 天氣實驗室遊戲 =====
+        function createWeatherGame() {
+            return `
+                <h2 class="game-title">⛅ 天氣實驗室</h2>
+                <p class="game-instructions">點擊按鈕，改變天氣！看看會發生什麼變化！</p>
+                <div id="weather-display" style="height: 200px; background: linear-gradient(to bottom, #87CEEB 0%, #E0F6FF 100%); border-radius: 20px; display: flex; align-items: center; justify-content: center; font-size: 5rem; transition: all 1s; position: relative; overflow: hidden;">
+                    <span id="weather-icon">☀️</span>
+                    <div id="weather-particles" style="position: absolute; width: 100%; height: 100%; pointer-events: none;"></div>
+                </div>
+                <div style="display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin-top: 20px;">
+                    <button class="unit-play-btn" onclick="changeWeather('sunny')" style="background: #f39c12;">☀️ 晴天</button>
+                    <button class="unit-play-btn" onclick="changeWeather('cloudy')" style="background: #636e72;">☁️ 多雲</button>
+                    <button class="unit-play-btn" onclick="changeWeather('rainy')" style="background: #0984e3;">🌧️ 下雨</button>
+                    <button class="unit-play-btn" onclick="changeWeather('stormy')" style="background: #2d3436;">⛈️ 暴風雨</button>
+                    <button class="unit-play-btn" onclick="changeWeather('snowy')" style="background: #dfe6e9;">❄️ 下雪</button>
+                </div>
+                <div id="weather-info" style="background: white; padding: 15px; border-radius: 15px; margin-top: 20px; text-align: center;">
+                    <p id="weather-desc">☀️ 晴天：陽光普照，適合戶外活動！</p>
+                </div>
+                <div style="text-align: center; margin-top: 15px;">
+                    <p style="margin-bottom: 10px;">天氣知識：<span id="weather-knowledge">0</span> / 5</p>
+                </div>
+                <button class="unit-play-btn" style="margin-top: 20px; background: #e74c3c;" onclick="closeGame()">關閉</button>
+            `;
+        }
+
+        let weatherCount = 0;
+        function initWeatherGame() {
+            weatherCount = 0;
+        }
+
+        function changeWeather(type) {
+            const display = document.getElementById('weather-display');
+            const icon = document.getElementById('weather-icon');
+            const desc = document.getElementById('weather-desc');
+            const particles = document.getElementById('weather-particles');
+            const knowledge = document.getElementById('weather-knowledge');
+            
+            particles.innerHTML = '';
+            
+            const weatherData = {
+                sunny: { icon: '☀️', bg: 'linear-gradient(to bottom, #87CEEB 0%, #E0F6FF 100%)', desc: '☀️ 晴天：陽光普照，適合戶外活動！' },
+                cloudy: { icon: '☁️', bg: 'linear-gradient(to bottom, #636e72 0%, #b2bec3 100%)', desc: '☁️ 多雲：雲朵遮住太陽天空灰濛濛！' },
+                rainy: { icon: '🌧️', bg: 'linear-gradient(to bottom, #0984e3 0%, #74b9ff 100%)', desc: '🌧️ 下雨天：記得帶雨傘出門喔！' },
+                stormy: { icon: '⛈️', bg: 'linear-gradient(to bottom, #2d3436 0%, #636e72 100%)', desc: '⛈️ 暴風雨：電閃雷鳴，要待在室內！' },
+                snowy: { icon: '❄️', bg: 'linear-gradient(to bottom, #dfe6e9 0%, #b2bec3 100%)', desc: '❄️ 下雪天：好冷喔！可以堆雪人！' }
+            };
+            
+            const data = weatherData[type];
+            display.style.background = data.bg;
+            icon.textContent = data.icon;
+            desc.textContent = data.desc;
+            
+            // 添加粒子效果
+            if (type === 'rainy' || type === 'stormy') {
+                for (let i = 0; i < 50; i++) {
+                    const rain = document.createElement('div');
+                    rain.textContent = '💧';
+                    rain.style.cssText = `
+                        position: absolute; font-size: 1rem;
+                        left: ${Math.random() * 100}%;
+                        top: ${Math.random() * 100}%;
+                        animation: fall ${1 + Math.random()}s linear infinite;
+                        animation-delay: ${Math.random()}s;
+                    `;
+                    particles.appendChild(rain);
+                }
+            } else if (type === 'snowy') {
+                for (let i = 0; i < 30; i++) {
+                    const snow = document.createElement('div');
+                    snow.textContent = '❄️';
+                    snow.style.cssText = `
+                        position: absolute; font-size: 1rem;
+                        left: ${Math.random() * 100}%;
+                        top: ${Math.random() * 100}%;
+                        animation: fall ${2 + Math.random() * 2}s linear infinite;
+                        animation-delay: ${Math.random()}s;
+                    `;
+                    particles.appendChild(snow);
+                }
+            }
+            
+            weatherCount++;
+            knowledge.textContent = weatherCount;
+            
+            if (weatherCount >= 5) {
+                setTimeout(() => completeAndClose('earth-1'), 1000);
+            }
+        }
+
+        // ===== 火山爆發模擬遊戲 =====
+        function createVolcanoGame() {
+            return `
+                <h2 class="game-title">🌋 火山爆發模擬</h2>
+                <p class="game-instructions">點擊「引爆火山」，觀察火山爆發的原理！</p>
+                <div style="position: relative; width: 100%; max-width: 400px; margin: 0 auto;">
+                    <div style="height: 300px; position: relative; display: flex; align-items: flex-end; justify-content: center;">
+                        <!-- 火山 -->
+                        <div style="position: relative; width: 200px; height: 200px;">
+                            <div style="position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 100px solid transparent; border-right: 100px solid transparent; border-bottom: 200px solid #8b4513;">
+                            </div>
+                            <div style="position: absolute; bottom: 180px; left: 50%; transform: translateX(-50%); width: 60px; height: 40px; background: #654321; border-radius: 50% 50% 0 0;">
+                                <div id="volcano-vent" style="position: absolute; bottom: 5px; left: 50%; transform: translateX(-50%); width: 20px; height: 20px; background: #333; border-radius: 50%;"></div>
+                            </div>
+                        </div>
+                        
+                        <!-- 岩漿和火山灰 -->
+                        <div id="lava-container" style="position: absolute; bottom: 150px; left: 50%; transform: translateX(-50%); pointer-events: none;">
+                        </div>
+                    </div>
+                    
+                    <!-- 地面 -->
+                    <div style="background: linear-gradient(to bottom, #228b22, #006400); height: 50px; border-radius: 0 0 20px 20px;"></div>
+                </div>
+                
+                <div style="text-align: center; margin-top: 20px;">
+                    <button class="unit-play-btn" id="erupt-btn" onclick="triggerEruption()" style="background: linear-gradient(135deg, #e74c3c, #c0392b); font-size: 1.3rem;">
+                        💥 引爆火山！
+                    </button>
+                </div>
+                
+                <div id="volcano-info" style="background: #ffeaa7; padding: 15px; border-radius: 15px; margin-top: 20px; text-align: center;">
+                    <p>🌋 <strong>火山爆發原理：</strong></p>
+                    <p>地球內部非常炎熱，岩石會融化成岩漿。岩漿膨脹產生巨大壓力，最後從火山口爆發出來！</p>
+                </div>
+                
+                <div style="text-align: center; margin-top: 15px;">
+                    <p>爆發體驗：<span id="eruption-count">0</span> / 1</p>
+                </div>
+                
+                <button class="unit-play-btn" style="margin-top: 20px; background: #e74c3c;" onclick="closeGame()">關閉</button>
+                
+                <style>
+                    @keyframes lavaRise {
+                        0% { transform: translateY(0) scale(1); opacity: 1; }
+                        100% { transform: translateY(-150px) scale(1.5); opacity: 0; }
+                    }
+                    @keyframes ashFall {
+                        0% { transform: translateY(-100px) rotate(0deg); opacity: 1; }
+                        100% { transform: translateY(200px) rotate(360deg); opacity: 0; }
+                    }
+                    @keyframes shake {
+                        0%, 100% { transform: translateX(0); }
+                        25% { transform: translateX(-5px); }
+                        75% { transform: translateX(5px); }
+                    }
+                </style>
+            `;
+        }
+
+        let eruptionDone = false;
+        function initVolcanoGame() {
+            eruptionDone = false;
+            document.getElementById('eruption-count').textContent = '0';
+        }
+
+        function triggerEruption() {
+            if (eruptionDone) return;
+            
+            const container = document.getElementById('lava-container');
+            const vent = document.getElementById('volcano-vent');
+            const btn = document.getElementById('erupt-btn');
+            
+            btn.disabled = true;
+            btn.textContent = '爆發中...';
+            
+            // 震動效果
+            const volcano = document.querySelector('.game-container').querySelector('div');
+            volcano.style.animation = 'shake 0.2s infinite';
+            
+            // 岩漿粒子
+            for (let i = 0; i < 20; i++) {
+                setTimeout(() => {
+                    const lava = document.createElement('div');
+                    lava.textContent = '🔥';
+                    lava.style.cssText = `
+                        position: absolute; font-size: ${1 + Math.random() * 2}rem;
+                        left: ${-50 + Math.random() * 100}px;
+                        animation: lavaRise ${1 + Math.random()}s ease-out forwards;
+                    `;
+                    container.appendChild(lava);
+                    
+                    // 火山灰
+                    const ash = document.createElement('div');
+                    ash.textContent = '🌫️';
+                    ash.style.cssText = `
+                        position: absolute; font-size: 1.5rem;
+                        left: ${-80 + Math.random() * 160}px;
+                        animation: ashFall ${2 + Math.random()}s ease-out forwards;
+                        animation-delay: ${Math.random() * 0.5}s;
+                    `;
+                    container.appendChild(ash);
+                }, i * 100);
+            }
+            
+            // 岩漿池效果
+            vent.style.background = '#e74c3c';
+            vent.style.boxShadow = '0 0 30px #f39c12';
+            
+            setTimeout(() => {
+                volcano.style.animation = '';
+                eruptionDone = true;
+                document.getElementById('eruption-count').textContent = '1';
+                btn.textContent = '✅ 已爆發！';
+                document.getElementById('volcano-info').innerHTML = '<span style="color: #27ae60;">🎉 太震撼了！現在你了解火山爆發的原理了！</span>';
+                setTimeout(() => completeAndClose('earth-2'), 2000);
+            }, 3000);
+        }
+
+        // ===== 水循環遊戲 =====
+        function createWaterCycleGame() {
+            return `
+                <h2 class="game-title">💧 水循環動畫</h2>
+                <p class="game-instructions">點擊「開始」，跟著水滴一起經歷水循環的旅程！</p>
+                <div id="water-cycle-display" style="position: relative; height: 350px; background: linear-gradient(to bottom, #87CEEB 0%, #E0F6FF 60%, #90EE90 60%, #228B22 100%); border-radius: 20px; overflow: hidden;">
+                    <!-- 太陽 -->
+                    <div style="position: absolute; top: 20px; right: 30px; font-size: 4rem;">☀️</div>
+                    
+                    <!-- 雲 -->
+                    <div style="position: absolute; top: 30px; left: 50px; font-size: 3rem;">☁️</div>
+                    <div style="position: absolute; top: 50px; left: 150px; font-size: 2.5rem;">☁️</div>
+                    
+                    <!-- 山 -->
+                    <div style="position: absolute; bottom: 90px; right: 20px; font-size: 3rem;">🏔️</div>
+                    
+                    <!-- 水滴 -->
+                    <div id="water-drop" style="position: absolute; font-size: 2rem; transition: all 2s linear;">💧</div>
+                    
+                    <!-- 河流 -->
+                    <div style="position: absolute; bottom: 60px; left: 30%; width: 40%; height: 20px; background: #0984e3; border-radius: 10px; opacity: 0.7;"></div>
+                    
+                    <!-- 階段標籤 -->
+                    <div id="cycle-label" style="position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); background: rgba(255,255,255,0.9); padding: 8px 15px; border-radius: 20px; font-weight: 700;">
+                        點擊「開始旅程」
+                    </div>
+                </div>
+                
+                <div style="text-align: center; margin-top: 20px;">
+                    <button class="unit-play-btn" id="start-cycle" onclick="startWaterCycle()" style="background: linear-gradient(135deg, #0984e3, #00cec9);">
+                        🚀 開始水滴的旅程
+                    </button>
+                </div>
+                
+                <div style="display: flex; justify-content: center; gap: 20px; margin-top: 20px; flex-wrap: wrap;">
+                    <div class="cycle-step" id="step-evaporation" style="padding: 10px 15px; background: #ffeaa7; border-radius: 10px; opacity: 0.5;">
+                        1️⃣ 蒸發
+                    </div>
+                    <div class="cycle-step" id="step-condensation" style="padding: 10px 15px; background: #ffeaa7; border-radius: 10px; opacity: 0.5;">
+                        2️⃣ 凝結
+                    </div>
+                    <div class="cycle-step" id="step-precipitation" style="padding: 10px 15px; background: #ffeaa7; border-radius: 10px; opacity: 0.5;">
+                        3️⃣ 降水
+                    </div>
+                    <div class="cycle-step" id="step-collection" style="padding: 10px 15px; background: #ffeaa7; border-radius: 10px; opacity: 0.5;">
+                        4️⃣ 集流
+                    </div>
+                </div>
+                
+                <button class="unit-play-btn" style="margin-top: 20px; background: #e74c3c;" onclick="closeGame()">關閉</button>
+            `;
+        }
+
+        let cycleStep = 0;
+        function initWaterCycleGame() {
+            cycleStep = 0;
+        }
+
+        function startWaterCycle() {
+            const drop = document.getElementById('water-drop');
+            const label = document.getElementById('cycle-label');
+            const btn = document.getElementById('start-cycle');
+            
+            btn.disabled = true;
+            btn.textContent = '旅途中...';
+            
+            const steps = [
+                { pos: 'left: 100px; bottom: 150px;', label: '1️⃣ 蒸發：太陽公公把水變成水蒸氣往上飘！', highlight: 'step-evaporation' },
+                { pos: 'left: 80px; bottom: 220px;', label: '2️⃣ 凝結：水蒸氣遇冷變成小水滴，形成雲！', highlight: 'step-condensation' },
+                { pos: 'left: 120px; bottom: 180px;', label: '3️⃣ 降水：雲裡的水滴太重了，變成雨落下來！', highlight: 'step-precipitation' },
+                { pos: 'left: 150px; bottom: 80px;', label: '4️⃣ 集流：雨水流到河流、湖泊，回到大海！', highlight: 'step-collection' }
+            ];
+            
+            function goStep(i) {
+                if (i >= steps.length) {
+                    label.textContent = '🌊 水滴回到大海，準備開始新的旅程！';
+                    label.innerHTML = '<span style="color: #27ae60;">🌊 完成！水循環永遠不停地進行著！</span>';
+                    btn.textContent = '✅ 完成！';
+                    setTimeout(() => completeAndClose('earth-3'), 2000);
+                    return;
+                }
+                
+                // 清除之前的 highlight
+                document.querySelectorAll('.cycle-step').forEach(el => el.style.opacity = '0.5');
+                
+                const step = steps[i];
+                drop.style.cssText = `position: absolute; font-size: 2rem; ${step.pos}`;
+                label.textContent = step.label;
+                document.getElementById(step.highlight).style.opacity = '1';
+                document.getElementById(step.highlight).style.transform = 'scale(1.1)';
+                
+                setTimeout(() => goStep(i + 1), 3000);
+            }
+            
+            goStep(0);
+        }
+
+        function completeAndClose(unitId) {
+            ScienceGame.completeUnit(unitId, 'earth');
+            closeGame();
+        }
+    </script>
+    <style>
+        .game-modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.9);
+            z-index: 200;
+            overflow-y: auto;
+            padding: 20px;
+        }
+        @keyframes fall {
+            0% { transform: translateY(-20px); opacity: 1; }
+            100% { transform: translateY(200px); opacity: 0; }
+        }
+    </style>
+</body>
+</html>

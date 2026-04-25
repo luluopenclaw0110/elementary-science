@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>恐龍世界 - 自然科學</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="cosmic-bg dino" id="cosmicBg"></div>
+    
+    <header class="header">
+        <div class="header-content">
+            <a href="../index.html" class="back-btn">← 返回首頁</a>
+            <div class="header-right">
+                <div class="stars-counter">
+                    <span class="star-icon">⭐</span>
+                    <span id="totalStars">0</span> 星星
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <section class="page-header">
+            <h1 class="page-title">🦖 恐龍世界</h1>
+            <p class="page-subtitle">認識遠古巨獸，探索恐龍的興衰史！</p>
+        </section>
+
+        <section class="units-grid">
+            <!-- 單元1：恐龍種類 -->
+            <div class="unit-card" id="unit-dino-1">
+                <div class="unit-header">
+                    <span class="unit-number">單元 1</span>
+                    <span class="unit-status" id="status-dino-1">☆</span>
+                </div>
+                <h3 class="unit-title">🦕 恐龍配對</h3>
+                <p class="unit-desc">將恐龍和牠們的特徵配對成功！</p>
+                <button class="unit-play-btn" onclick="openGame('dino-match')">開始遊戲</button>
+            </div>
+
+            <!-- 單元2：時間軸 -->
+            <div class="unit-card" id="unit-dino-2">
+                <div class="unit-header">
+                    <span class="unit-number">單元 2</span>
+                    <span class="unit-status" id="status-dino-2">☆</span>
+                </div>
+                <h3 class="unit-title">📅 恐龍時間軸</h3>
+                <p class="unit-desc">將不同時期的恐龍按照出現順序排列！</p>
+                <button class="unit-play-btn" onclick="openGame('dino-timeline')">開始遊戲</button>
+            </div>
+
+            <!-- 單元3：滅絕之謎 -->
+            <div class="unit-card" id="unit-dino-3">
+                <div class="unit-header">
+                    <span class="unit-number">單元 3</span>
+                    <span class="unit-status" id="status-dino-3">☆</span>
+                </div>
+                <h3 class="unit-title">💫 滅絕之謎</h3>
+                <p class="unit-desc">透過實驗了解恐龍滅絕的原因！</p>
+                <button class="unit-play-btn" onclick="openGame('dino-extinction')">開始遊戲</button>
+            </div>
+        </section>
+    </main>
+
+    <div class="game-modal" id="gameModal">
+        <div class="game-container" id="gameContent"></div>
+    </div>
+
+    <script src="../js/main.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            ScienceGame.loadProgress();
+            ScienceGame.updateTotalStars();
+        });
+
+        function openGame(gameType) {
+            const modal = document.getElementById('gameModal');
+            const content = document.getElementById('gameContent');
+            let gameHTML = '';
+            
+            switch(gameType) {
+                case 'dino-match':
+                    gameHTML = createDinoMatchGame();
+                    break;
+                case 'dino-timeline':
+                    gameHTML = createDinoTimelineGame();
+                    break;
+                case 'dino-extinction':
+                    gameHTML = createDinoExtinctionGame();
+                    break;
+            }
+            
+            content.innerHTML = gameHTML;
+            modal.style.display = 'block';
+            
+            if (gameType === 'dino-match') initDinoMatchGame();
+            if (gameType === 'dino-timeline') initDinoTimelineGame();
+            if (gameType === 'dino-extinction') initDinoExtinctionGame();
+        }
+
+        function closeGame() {
+            document.getElementById('gameModal').style.display = 'none';
+        }
+
+        // ===== 恐龍配對遊戲 =====
+        function createDinoMatchGame() {
+            return `
+                <h2 class="game-title">🦕 恐龍配對挑戰</h2>
+                <p class="game-instructions">點擊兩張卡片，將恐龍和牠的特徵配對！</p>
+                <div id="dino-match-grid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; max-width: 600px; margin: 0 auto;"></div>
+                <div id="match-score" style="text-align: center; margin-top: 20px; font-size: 1.2rem;">配對成功：0 / 4</div>
+                <button class="unit-play-btn" style="margin-top: 20px; background: #e74c3c;" onclick="closeGame()">關閉</button>
+            `;
+        }
+
+        function initDinoMatchGame() {
+            const dinos = [
+                { name: '暴龍', emoji: '🦖', trait: '最強獵手', traitEmoji: '👑' },
+                { name: '三角龍', emoji: '🦕', trait: '三隻角', traitEmoji: '🔺' },
+                { name: '劍龍', emoji: '🦖', trait: '背板防禦', traitEmoji: '🛡️' },
+                { name: '翼龍', emoji: '🦅', trait: '會飛翔', traitEmoji: '✈️' }
+            ];
+            
+            let cards = [];
+            let flipped = [];
+            let matched = 0;
+            let canFlip = true;
+            
+            dinos.forEach(d => {
+                cards.push({ id: d.name, type: 'dino', content: d.emoji + ' ' + d.name });
+                cards.push({ id: d.name, type: 'trait', content: d.traitEmoji + ' ' + d.trait });
+            });
+            
+            cards = ScienceGame.shuffle(cards);
+            
+            const grid = document.getElementById('dino-match-grid');
+            grid.style.gridTemplateColumns = 'repeat(4, 1fr)';
+            
+            cards.forEach((card, i) => {
+                const cardEl = document.createElement('div');
+                cardEl.className = 'match-card';
+                cardEl.dataset.index = i;
+                cardEl.dataset.id = card.id;
+                cardEl.dataset.type = card.type;
+                cardEl.style.cssText = `
+                    height: 80px; background: linear-gradient(135deg, #27ae60, #2ecc71);
+                    border-radius: 15px; display: flex; align-items: center; justify-content: center;
+                    font-size: 1.2rem; color: white; cursor: pointer; font-weight: 700;
+                    transition: transform 0.3s; user-select: none;
+                `;
+                cardEl.textContent = '?';
+                cardEl.onclick = () => flipCard(cardEl, card);
+                grid.appendChild(cardEl);
+            });
+            
+            function flipCard(el, card) {
+                if (!canFlip || flipped.includes(el) || el.textContent !== '?') return;
+                
+                el.textContent = card.content;
+                flipped.push(el);
+                
+                if (flipped.length === 2) {
+                    canFlip = false;
+                    const [c1, c2] = flipped;
+                    
+                    if (c1.dataset.id === c2.dataset.id && c1.dataset.type !== c2.dataset.type) {
+                        // 配對成功
+                        matched++;
+                        document.getElementById('match-score').textContent = `配對成功：${matched} / 4`;
+                        c1.style.background = 'linear-gradient(135deg, #f39c12, #e67e22)';
+                        c2.style.background = 'linear-gradient(135deg, #f39c12, #e67e22)';
+                        flipped = [];
+                        canFlip = true;
+                        
+                        if (matched === 4) {
+                            setTimeout(() => completeAndClose('dino-1'), 1000);
+                        }
+                    } else {
+                        // 配對失敗
+                        setTimeout(() => {
+                            c1.textContent = '?';
+                            c2.textContent = '?';
+                            flipped = [];
+                            canFlip = true;
+                        }, 1000);
+                    }
+                }
+            }
+        }
+
+        // ===== 恐龍時間軸遊戲 =====
+        function createDinoTimelineGame() {
+            return `
+                <h2 class="game-title">📅 恐龍時間軸</h2>
+                <p class="game-instructions">將恐龍按照出現順序排列（三疊紀 → 侏羅紀 → 白堊紀）</p>
+                <div style="background: linear-gradient(to right, #e74c3c, #f39c12, #27ae60); height: 30px; border-radius: 15px; margin-bottom: 20px;">
+                    <span style="float: left; padding-left: 10px; line-height: 30px; color: white; font-weight: 700;">三疊紀</span>
+                    <span style="float: right; padding-right: 10px; line-height: 30px; color: white; font-weight: 700;">白堊紀</span>
+                </div>
+                <div id="timeline-area" style="display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin-bottom: 20px;"></div>
+                <div style="text-align: center;">
+                    <p style="margin-bottom: 10px;">拖動恐龍到正確的時代：</p>
+                    <div id="dino-timeline-zone" style="display: flex; justify-content: center; gap: 20px; margin-bottom: 20px;">
+                        <div class="era-zone" data-era="triassic" style="width: 150px; height: 100px; border: 3px dashed #e74c3c; border-radius: 15px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                            <span style="color: #e74c3c; font-weight: 700;">三疊紀</span>
+                            <span style="font-size: 0.9rem;">2.5億年前</span>
+                        </div>
+                        <div class="era-zone" data-era="jurassic" style="width: 150px; height: 100px; border: 3px dashed #f39c12; border-radius: 15px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                            <span style="color: #f39c12; font-weight: 700;">侏羅紀</span>
+                            <span style="font-size: 0.9rem;">2億年前</span>
+                        </div>
+                        <div class="era-zone" data-era="cretaceous" style="width: 150px; height: 100px; border: 3px dashed #27ae60; border-radius: 15px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                            <span style="color: #27ae60; font-weight: 700;">白堊紀</span>
+                            <span style="font-size: 0.9rem;">1.4億年前</span>
+                        </div>
+                    </div>
+                </div>
+                <div id="timeline-result" style="text-align: center; font-size: 1.2rem;"></div>
+                <button class="unit-play-btn" style="margin-top: 20px; background: #e74c3c;" onclick="closeGame()">關閉</button>
+            `;
+        }
+
+        function initDinoTimelineGame() {
+            const dinos = [
+                { name: '板龍', emoji: '🦕', era: 'triassic', period: '三疊紀' },
+                { name: '異齒龍', emoji: '🦖', era: 'triassic', period: '三疊紀' },
+                { name: '腕龍', emoji: '🦕', era: 'jurassic', period: '侏羅紀' },
+                { name: '劍龍', emoji: '🦖', era: 'jurassic', period: '侏羅紀' },
+                { name: '暴龍', emoji: '🦖', era: 'cretaceous', period: '白堊紀' },
+                { name: '三角龍', emoji: '🦕', era: 'cretaceous', period: '白堊紀' }
+            ];
+            
+            const shuffled = ScienceGame.shuffle(dinos);
+            const zone = document.getElementById('timeline-area');
+            const eraZones = document.querySelectorAll('.era-zone');
+            const result = document.getElementById('timeline-result');
+            
+            shuffled.forEach(dino => {
+                const el = document.createElement('div');
+                el.className = 'timeline-dino';
+                el.dataset.era = dino.era;
+                el.style.cssText = `
+                    padding: 10px 15px; background: #3498db; color: white;
+                    border-radius: 10px; cursor: grab; font-weight: 700;
+                    display: flex; align-items: center; gap: 5px;
+                `;
+                el.innerHTML = `${dino.emoji} ${dino.name}`;
+                
+                ScienceGame.enableDrag(el, (dropped) => {
+                    const droppedEra = dropped.dataset.era;
+                    if (droppedEra === dropped.dataset.era) {
+                        // 正確放置
+                    }
+                    checkTimelineComplete();
+                });
+                
+                zone.appendChild(el);
+            });
+            
+            function checkTimelineComplete() {
+                let correct = 0;
+                eraZones.forEach(zone => {
+                    const era = zone.dataset.era;
+                    const dinosInZone = zone.querySelectorAll('.timeline-dino');
+                    dinosInZone.forEach(d => {
+                        if (d.dataset.era === era) correct++;
+                    });
+                });
+                
+                result.textContent = `正確擺放：${correct} / 6`;
+                if (correct === 6) {
+                    result.innerHTML = '<span style="color: #27ae60;">🎉 全部正確！你們了解恐龍時代！</span>';
+                    setTimeout(() => completeAndClose('dino-2'), 1500);
+                }
+            }
+        }
+
+        // ===== 滅絕之謎遊戲 =====
+        function createDinoExtinctionGame() {
+            return `
+                <h2 class="game-title">💫 恐龍滅絕之謎</h2>
+                <p class="game-instructions">點擊選項，了解導致恐龍滅絕的可能原因！</p>
+                <div id="extinction-content" style="padding: 20px;">
+                    <div style="background: linear-gradient(135deg, #2c3e50, #34495e); border-radius: 20px; padding: 30px; margin-bottom: 20px;">
+                        <p style="font-size: 1.3rem; line-height: 1.8; color: white;">
+                            6600萬年前，地球上的恐龍突然全部消失了！科學家提出許多理論來解釋這個謎題。
+                            <br><br>
+                            請點擊下方選項，探索各種可能的原因：
+                        </p>
+                    </div>
+                    <div id="extinction-options" style="display: flex; flex-direction: column; gap: 15px; max-width: 500px; margin: 0 auto;">
+                        <button class="unit-play-btn" onclick="showExtinctionTheory('asteroid')" style="background: linear-gradient(135deg, #9b59b6, #8e44ad);">
+                            ☄️ 小行星撞擊說
+                        </button>
+                        <button class="unit-play-btn" onclick="showExtinctionTheory('volcano')" style="background: linear-gradient(135deg, #e74c3c, #c0392b);">
+                            🌋 火山爆發說
+                        </button>
+                        <button class="unit-play-btn" onclick="showExtinctionTheory('climate')" style="background: linear-gradient(135deg, #3498db, #2980b9);">
+                            ❄️ 氣候變化說
+                        </button>
+                    </div>
+                    <div id="extinction-result" style="margin-top: 20px; padding: 20px; background: white; border-radius: 15px; display: none;">
+                    </div>
+                    <div id="extinction-progress" style="text-align: center; margin-top: 20px; font-size: 1.2rem;">
+                        已探索：<span id="theoryCount">0</span> / 3 個理論
+                    </div>
+                </div>
+                <button class="unit-play-btn" style="margin-top: 20px; background: #e74c3c;" onclick="closeGame()">關閉</button>
+            `;
+        }
+
+        let theoriesViewed = 0;
+        function initDinoExtinctionGame() {
+            theoriesViewed = 0;
+            document.getElementById('theoryCount').textContent = '0';
+        }
+
+        function showExtinctionTheory(theory) {
+            theoriesViewed++;
+            document.getElementById('theoryCount').textContent = theoriesViewed;
+            
+            const result = document.getElementById('extinction-result');
+            result.style.display = 'block';
+            
+            const theories = {
+                asteroid: {
+                    title: '☄️ 小行星撞擊說',
+                    content: '一顆巨大的小行星在6600萬年前撞擊了地球，撞擊點在現在的墨西哥尤卡坦半島。撞擊引發的灰塵和碎片遮蔽了陽光，導致植物死亡，恐龍失去食物來源而滅絕。科學家在這個地層中發現了「銥」元素，這種元素在地球上很少見，但在小行星上很多！'
+                },
+                volcano: {
+                    title: '🌋 火山爆發說',
+                    content: '印度德干高原的超級火山在6600萬年前持續爆發了數十萬年，噴出大量火山灰和氣體。這些物質進入大氣層，遮擋陽光並使地球溫度驟降。火山爆發也導致酸雨和海洋酸化，嚴重破壞了生態系統。'
+                },
+                climate: {
+                    title: '❄️ 氣候變化說',
+                    content: '在恐龍時代末期，地球的氣候發生了巨大變化。海洋流動改變，導致全球溫度下降，冰川形成。植物群落改變，食草恐龍失去食物，接著影響到肉食恐龍。氣候的緩慢變化讓恐龍來不及適應新環境。'
+                }
+            };
+            
+            const t = theories[theory];
+            result.innerHTML = `
+                <h3 style="margin-bottom: 10px;">${t.title}</h3>
+                <p style="line-height: 1.8;">${t.content}</p>
+            `;
+            
+            if (theoriesViewed >= 3) {
+                setTimeout(() => completeAndClose('dino-3'), 1500);
+            }
+        }
+
+        function completeAndClose(unitId) {
+            ScienceGame.completeUnit(unitId, 'dino');
+            closeGame();
+        }
+    </script>
+    <style>
+        .game-modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.9);
+            z-index: 200;
+            overflow-y: auto;
+            padding: 20px;
+        }
+        .match-card {
+            transform-style: preserve-3d;
+        }
+        .timeline-dino {
+            touch-action: none;
+        }
+    </style>
+</body>
+</html>

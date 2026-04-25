@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>人體奧秘 - 自然科學</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="cosmic-bg body" id="cosmicBg"></div>
+    
+    <header class="header">
+        <div class="header-content">
+            <a href="../index.html" class="back-btn">← 返回首頁</a>
+            <div class="header-right">
+                <div class="stars-counter">
+                    <span class="star-icon">⭐</span>
+                    <span id="totalStars">0</span> 星星
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <section class="page-header">
+            <h1 class="page-title">🫀 人體奧秘</h1>
+            <p class="page-subtitle">認識我們的身體，了解器官的神奇功能！</p>
+        </section>
+
+        <section class="units-grid">
+            <!-- 單元1：器官位置 -->
+            <div class="unit-card" id="unit-body-1">
+                <div class="unit-header">
+                    <span class="unit-number">單元 1</span>
+                    <span class="unit-status" id="status-body-1">☆</span>
+                </div>
+                <h3 class="unit-title">🧩 人體拼圖</h3>
+                <p class="unit-desc">將器官放到正確的位置！</p>
+                <button class="unit-play-btn" onclick="openGame('organ-puzzle')">開始遊戲</button>
+            </div>
+
+            <!-- 單元2：消化旅程 -->
+            <div class="unit-card" id="unit-body-2">
+                <div class="unit-header">
+                    <span class="unit-number">單元 2</span>
+                    <span class="unit-status" id="status-body-2">☆</span>
+                </div>
+                <h3 class="unit-title">🍔 消化旅程</h3>
+                <p class="unit-desc">跟著食物一起探索消化系統！</p>
+                <button class="unit-play-btn" onclick="openGame('digestion')">開始遊戲</button>
+            </div>
+
+            <!-- 單元3：循環系統 -->
+            <div class="unit-card" id="unit-body-3">
+                <div class="unit-header">
+                    <span class="unit-number">單元 3</span>
+                    <span class="unit-status" id="status-body-3">☆</span>
+                </div>
+                <h3 class="unit-title">❤️ 血液循環</h3>
+                <p class="unit-desc">了解血液在心臟和血管中的旅程！</p>
+                <button class="unit-play-btn" onclick="openGame('circulation')">開始遊戲</button>
+            </div>
+        </section>
+    </main>
+
+    <div class="game-modal" id="gameModal">
+        <div class="game-container" id="gameContent"></div>
+    </div>
+
+    <script src="../js/main.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            ScienceGame.loadProgress();
+            ScienceGame.updateTotalStars();
+        });
+
+        function openGame(gameType) {
+            const modal = document.getElementById('gameModal');
+            const content = document.getElementById('gameContent');
+            let gameHTML = '';
+            
+            switch(gameType) {
+                case 'organ-puzzle':
+                    gameHTML = createOrganPuzzleGame();
+                    break;
+                case 'digestion':
+                    gameHTML = createDigestionGame();
+                    break;
+                case 'circulation':
+                    gameHTML = createCirculationGame();
+                    break;
+            }
+            
+            content.innerHTML = gameHTML;
+            modal.style.display = 'block';
+            
+            if (gameType === 'organ-puzzle') initOrganPuzzleGame();
+            if (gameType === 'digestion') initDigestionGame();
+            if (gameType === 'circulation') initCirculationGame();
+        }
+
+        function closeGame() {
+            document.getElementById('gameModal').style.display = 'none';
+        }
+
+        // ===== 人體拼圖遊戲 =====
+        function createOrganPuzzleGame() {
+            return `
+                <h2 class="game-title">🧩 人體器官拼圖</h2>
+                <p class="game-instructions">將器官拖放到人體的正確位置！</p>
+                <div style="display: flex; gap: 30px; justify-content: center; flex-wrap: wrap;">
+                    <div id="body-outline" style="position: relative; width: 200px; height: 400px; background: rgba(255,200,200,0.3); border-radius: 100px; border: 3px solid #e74c3c;">
+                        <div class="organ-slot" data-organ="heart" style="position: absolute; left: 130px; top: 80px; width: 60px; height: 60px; border: 2px dashed #e74c3c; border-radius: 50%;"></div>
+                        <div class="organ-slot" data-organ="lung" style="position: absolute; left: 140px; top: 140px; width: 50px; height: 70px; border: 2px dashed #3498db; border-radius: 50%;"></div>
+                        <div class="organ-slot" data-organ="liver" style="position: absolute; left: 130px; top: 220px; width: 60px; height: 40px; border: 2px dashed #8b4513; border-radius: 20px;"></div>
+                        <div class="organ-slot" data-organ="stomach" style="position: absolute; left: 70px; top: 200px; width: 50px; height: 40px; border: 2px dashed #f39c12; border-radius: 25px;"></div>
+                        <div class="organ-slot" data-organ="brain" style="position: absolute; left: 70px; top: 20px; width: 60px; height: 50px; border: 2px dashed #9b59b6; border-radius: 30px;"></div>
+                    </div>
+                    <div id="organ-tray" style="display: flex; flex-direction: column; gap: 10px;"></div>
+                </div>
+                <div id="organ-result" style="text-align: center; margin-top: 20px; font-size: 1.2rem;"></div>
+                <button class="unit-play-btn" style="margin-top: 20px; background: #e74c3c;" onclick="closeGame()">關閉</button>
+            `;
+        }
+
+        function initOrganPuzzleGame() {
+            const organs = [
+                { name: '心臟', emoji: '❤️', id: 'heart', color: '#e74c3c' },
+                { name: '肺', emoji: '🫁', id: 'lung', color: '#3498db' },
+                { name: '肝臟', emoji: '🟤', id: 'liver', color: '#8b4513' },
+                { name: '胃', emoji: '🟠', id: 'stomach', color: '#f39c12' },
+                { name: '大腦', emoji: '🧠', id: 'brain', color: '#9b59b6' }
+            ];
+            
+            const shuffled = ScienceGame.shuffle(organs);
+            const tray = document.getElementById('organ-tray');
+            const slots = document.querySelectorAll('.organ-slot');
+            let placed = 0;
+            
+            shuffled.forEach(organ => {
+                const el = document.createElement('div');
+                el.className = 'organ-item';
+                el.dataset.organ = organ.id;
+                el.style.cssText = `
+                    padding: 10px 20px; background: ${organ.color}; color: white;
+                    border-radius: 10px; cursor: grab; font-weight: 700;
+                    display: flex; align-items: center; gap: 10px;
+                `;
+                el.innerHTML = `${organ.emoji} ${organ.name}`;
+                
+                ScienceGame.enableDrag(el, (dropped) => {
+                    slots.forEach(slot => {
+                        if (slot.dataset.organ === dropped.dataset.organ && !slot.querySelector('.organ-item')) {
+                            const rect = slot.getBoundingClientRect();
+                            dropped.style.position = 'absolute';
+                            dropped.style.left = '50%';
+                            dropped.style.top = '50%';
+                            dropped.style.transform = 'translate(-50%, -50%)';
+                            dropped.style.cursor = 'default';
+                            slot.appendChild(dropped);
+                            placed++;
+                            
+                            if (placed === 5) {
+                                document.getElementById('organ-result').innerHTML = '<span style="color: #27ae60;">🎉 太棒了！你認識所有人體器官了！</span>';
+                                setTimeout(() => completeAndClose('body-1'), 1500);
+                            }
+                        }
+                    });
+                });
+                
+                tray.appendChild(el);
+            });
+        }
+
+        // ===== 消化旅程遊戲 =====
+        function createDigestionGame() {
+            return `
+                <h2 class="game-title">🍔 消化系統之旅</h2>
+                <p class="game-instructions">點擊「開始」，跟著食物一起經過消化系統！</p>
+                <div id="digestion-game" style="position: relative; height: 350px; background: linear-gradient(to bottom, #ffeaa7 0%, #fdcb6e 100%); border-radius: 20px; overflow: hidden;">
+                    <div id="digestion-path" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80%; height: 80px; border: 3px solid #e17055; border-radius: 40px; display: flex; align-items: center; justify-content: center;">
+                        <div id="food-item" style="font-size: 3rem; position: absolute; left: 0; transition: left 1s linear;">🍔</div>
+                    </div>
+                    <div id="digestion-stations" style="position: absolute; width: 100%; display: flex; justify-content: space-around; padding: 0 30px;">
+                        <div class="station" data-station="mouth" style="position: absolute; left: 5%; top: 20px; text-align: center;">
+                            <span style="font-size: 2rem;">👄</span>
+                            <p style="font-size: 0.8rem;">口腔</p>
+                        </div>
+                        <div class="station" data-station="esophagus" style="position: absolute; left: 25%; top: -30px; text-align: center;">
+                            <span style="font-size: 2rem;">📍</span>
+                            <p style="font-size: 0.8rem;">食道</p>
+                        </div>
+                        <div class="station" data-station="stomach" style="position: absolute; left: 45%; top: 20px; text-align: center;">
+                            <span style="font-size: 2rem;">🫃</span>
+                            <p style="font-size: 0.8rem;">胃</p>
+                        </div>
+                        <div class="station" data-station="intestine" style="position: absolute; left: 70%; top: 20px; text-align: center;">
+                            <span style="font-size: 2rem;">🔄</span>
+                            <p style="font-size: 0.8rem;">小腸</p>
+                        </div>
+                        <div class="station" data-station="end" style="position: absolute; right: 5%; top: 20px; text-align: center;">
+                            <span style="font-size: 2rem;">🚽</span>
+                            <p style="font-size: 0.8rem;">排出</p>
+                        </div>
+                    </div>
+                </div>
+                <div id="digestion-info" style="text-align: center; margin-top: 15px; font-size: 1.1rem; min-height: 50px;"></div>
+                <div style="text-align: center; margin-top: 20px;">
+                    <button class="unit-play-btn" id="start-digestion" onclick="startDigestion()" style="background: linear-gradient(135deg, #e17055, #d63031);">
+                        開始旅程 🚀
+                    </button>
+                </div>
+                <button class="unit-play-btn" style="margin-top: 15px; background: #e74c3c;" onclick="closeGame()">關閉</button>
+            `;
+        }
+
+        let digestionStep = 0;
+        function initDigestionGame() {
+            digestionStep = 0;
+            document.getElementById('food-item').style.left = '0';
+            document.getElementById('digestion-info').textContent = '點擊「開始旅程」跟著食物一起旅行！';
+        }
+
+        function startDigestion() {
+            const stations = [
+                { pos: '5%', info: '👄 口腔：牙齒把食物咬碎，唾液開始消化！' },
+                { pos: '25%', info: '📍 食道：食物被推擠往下移動到胃！' },
+                { pos: '45%', info: '🫃 胃：胃酸和攪拌把食物變成糊狀！' },
+                { pos: '70%', info: '🔄 小腸：營養被吸收到血液中！' },
+                { pos: '92%', info: '🚽 大腸：剩餘的水分被吸收，廢物排出體外！' }
+            ];
+            
+            const btn = document.getElementById('start-digestion');
+            btn.disabled = true;
+            btn.textContent = '旅途中...';
+            
+            const food = document.getElementById('food-item');
+            const info = document.getElementById('digestion-info');
+            
+            function moveToStep(step) {
+                if (step >= stations.length) {
+                    info.innerHTML = '<span style="color: #27ae60;">🎉 消化旅程完成！食物變成營養讓我們長大！</span>';
+                    btn.textContent = '完成！';
+                    setTimeout(() => completeAndClose('body-2'), 2000);
+                    return;
+                }
+                
+                food.style.left = stations[step].pos;
+                info.textContent = stations[step].info;
+                
+                setTimeout(() => moveToStep(step + 1), 2000);
+            }
+            
+            moveToStep(0);
+        }
+
+        // ===== 血液循環遊戲 =====
+        function createCirculationGame() {
+            return `
+                <h2 class="game-title">❤️ 血液循環系統</h2>
+                <p class="game-instructions">點擊心臟，讓血液流遍全身！了解血液的循環路線。</p>
+                <div style="position: relative; width: 100%; max-width: 500px; margin: 0 auto;">
+                    <svg viewBox="0 0 400 300" style="width: 100%;">
+                        <!-- 心臟 -->
+                        <g id="heart-svg" onclick="pulseHeart()" style="cursor: pointer;">
+                            <path d="M200 250 C200 250, 150 200, 150 160 C150 130, 170 110, 200 130 C230 110, 250 130, 250 160 C250 200, 200 250, 200 250" fill="#e74c3c" stroke="#c0392b" stroke-width="3">
+                                <animate attributeName="d" dur="0.8s" repeatCount="indefinite" values="M200 250 C200 250, 150 200, 150 160 C150 130, 170 110, 200 130 C230 110, 250 130, 250 160 C250 200, 200 250, 200 250;M200 260 C200 260, 140 200, 140 160 C140 120, 170 100, 200 120 C230 100, 260 120, 260 160 C260 200, 200 260, 200 260;M200 250 C200 250, 150 200, 150 160 C150 130, 170 110, 200 130 C230 110, 250 130, 250 160 C250 200, 200 250, 200 250"/>
+                            </path>
+                        </g>
+                        
+                        <!-- 肺 -->
+                        <g>
+                            <ellipse cx="140" cy="180" rx="35" ry="50" fill="#74b9ff" opacity="0.7"/>
+                            <ellipse cx="260" cy="180" rx="35" ry="50" fill="#74b9ff" opacity="0.7"/>
+                            <text x="140" y="240" text-anchor="middle" font-size="12" fill="#333">肺</text>
+                        </g>
+                        
+                        <!-- 身體 -->
+                        <rect x="170" y="140" width="60" height="80" rx="10" fill="#ffeaa7" opacity="0.5"/>
+                        
+                        <!-- 血管線 -->
+                        <path id="blood-vessel-aorta" d="M200 130 Q200 80, 150 60 Q100 40, 100 100" fill="none" stroke="#e74c3c" stroke-width="4" stroke-dasharray="10,5" opacity="0.3">
+                        </path>
+                        <path id="blood-vessel-body" d="M100 100 Q60 100, 60 180 Q60 260, 200 260" fill="none" stroke="#e74c3c" stroke-width="4" stroke-dasharray="10,5" opacity="0.3">
+                        </path>
+                        <path id="blood-vessel-lungs" d="M200 260 Q300 260, 300 180 Q300 100, 200 130" fill="none" stroke="#74b9ff" stroke-width="4" stroke-dasharray="10,5" opacity="0.3">
+                        </path>
+                        
+                        <!-- 血液粒子 -->
+                        <circle id="blood-particle" cx="200" cy="250" r="8" fill="#e74c3c">
+                            <animate attributeName="cx" dur="4s" repeatCount="indefinite" values="200;200;140;100;60;60;200;200;260;300;300;200;200" keyTimes="0;0.1;0.2;0.3;0.4;0.5;0.6;0.7;0.8;0.85;0.9;0.95;1"/>
+                            <animate attributeName="cy" dur="4s" repeatCount="indefinite" values="250;130;80;60;100;180;260;260;180;100;60;130;250" keyTimes="0;0.1;0.2;0.3;0.4;0.5;0.6;0.7;0.8;0.85;0.9;0.95;1"/>
+                            <animate attributeName="fill" dur="4s" repeatCount="indefinite" values="#e74c3c;#e74c3c;#e74c3c;#e74c3c;#e74c3c;#74b9ff;#74b9ff;#74b9ff;#74b9ff;#74b9ff;#74b9ff;#e74c3c;#e74c3c" keyTimes="0;0.3;0.4;0.5;0.6;0.65;0.7;0.8;0.85;0.9;0.95;0.98;1"/>
+                        </circle>
+                        
+                        <!-- 標籤 -->
+                        <text x="80" y="30" font-size="11" fill="#e74c3c" id="label-aorta">🚬 含氧血</text>
+                        <text x="250" y="50" font-size="11" fill="#74b9ff" id="label-lungs">💨 肺循環</text>
+                        <text x="30" y="150" font-size="11" fill="#e74c3c" id="label-body">💪 體循環</text>
+                    </svg>
+                    
+                    <div style="text-align: center; margin-top: 20px;">
+                        <button class="unit-play-btn" onclick="startCirculation()" style="background: linear-gradient(135deg, #e74c3c, #c0392b);">
+                            ❤️ 點擊心臟加速血液流動
+                        </button>
+                    </div>
+                    
+                    <div id="circulation-info" style="background: #ffeaa7; padding: 15px; border-radius: 15px; margin-top: 20px; text-align: center;">
+                        <p>💡 <strong>你知道嗎？</strong></p>
+                        <p id="circulation-fact">心臟每天跳動約10萬次，幫助推動血液流遍全身！</p>
+                    </div>
+                </div>
+                <button class="unit-play-btn" style="margin-top: 20px; background: #e74c3c;" onclick="closeGame()">關閉</button>
+            `;
+        }
+
+        function initCirculationGame() {
+            const facts = [
+                '心臟每天跳動約10萬次，幫助推動血液流遍全身！',
+                '血液在體內循環一圈只需要約1分鐘！',
+                '紅血球負責攜帶氧氣，白血球負責對抗病菌！',
+                '心臟其實有左右兩個心房和兩個心室！',
+                '血管連接起來可以繞地球兩圈半！'
+            ];
+            
+            let factIndex = 0;
+            setInterval(() => {
+                factIndex = (factIndex + 1) % facts.length;
+                document.getElementById('circulation-fact').textContent = facts[factIndex];
+            }, 3000);
+            
+            // 追蹤點擊次數
+            window.heartClicks = 0;
+        }
+
+        function pulseHeart() {
+            window.heartClicks++;
+            const heart = document.getElementById('heart-svg');
+            heart.style.transform = 'scale(1.2)';
+            setTimeout(() => heart.style.transform = 'scale(1)', 200);
+            
+            if (window.heartClicks >= 5) {
+                setTimeout(() => completeAndClose('body-3'), 1000);
+            }
+        }
+
+        function startCirculation() {
+            pulseHeart();
+        }
+
+        function completeAndClose(unitId) {
+            ScienceGame.completeUnit(unitId, 'body');
+            closeGame();
+        }
+    </script>
+    <style>
+        .game-modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.9);
+            z-index: 200;
+            overflow-y: auto;
+            padding: 20px;
+        }
+        .organ-item {
+            touch-action: none;
+        }
+    </style>
+</body>
+</html>
