@@ -174,22 +174,65 @@ class GameTimer {
 function enableDrag(element, onDrop) {
     let isDragging = false;
     let offsetX, offsetY;
+    let currentPos = { left: element.offsetLeft, top: element.offsetTop };
     
+    // 設置初始位置
+    if (element.style.position !== 'absolute') {
+        element.style.position = 'absolute';
+        element.style.left = element.offsetLeft + 'px';
+        element.style.top = element.offsetTop + 'px';
+    }
+    
+    // 滑鼠事件
     element.addEventListener('mousedown', (e) => {
         isDragging = true;
-        offsetX = e.clientX - element.offsetLeft;
-        offsetY = e.clientY - element.offsetTop;
+        currentPos.left = element.offsetLeft;
+        currentPos.top = element.offsetTop;
+        offsetX = e.clientX - currentPos.left;
+        offsetY = e.clientY - currentPos.top;
         element.style.cursor = 'grabbing';
+        element.style.zIndex = '1000';
+        e.preventDefault();
     });
     
     document.addEventListener('mousemove', (e) => {
         if (isDragging) {
-            element.style.left = e.clientX - offsetX + 'px';
-            element.style.top = e.clientY - offsetY + 'px';
+            element.style.left = (e.clientX - offsetX) + 'px';
+            element.style.top = (e.clientY - offsetY) + 'px';
         }
     });
     
     document.addEventListener('mouseup', () => {
+        if (isDragging) {
+            isDragging = false;
+            element.style.cursor = 'grab';
+            if (onDrop) onDrop(element);
+        }
+    });
+    
+    // 觸控事件
+    element.addEventListener('touchstart', (e) => {
+        const touch = e.touches[0];
+        isDragging = true;
+        currentPos.left = element.offsetLeft;
+        currentPos.top = element.offsetTop;
+        offsetX = touch.clientX - currentPos.left;
+        offsetY = touch.clientY - currentPos.top;
+        element.style.cursor = 'grabbing';
+        element.style.zIndex = '1000';
+        e.preventDefault();
+    }, { passive: false });
+    
+    document.addEventListener('touchmove', (e) => {
+        if (isDragging) {
+            const touch = e.touches[0];
+            element.style.left = (touch.clientX - offsetX) + 'px';
+            element.style.top = (touch.clientY - offsetY) + 'px';
+            e.preventDefault();
+        }
+    }, { passive: false });
+    
+    document.addEventListener('touchend', () => {
         if (isDragging) {
             isDragging = false;
             element.style.cursor = 'grab';
