@@ -114,7 +114,7 @@
             return `
                 <h2 class="game-title">🚀 太陽系八大行星</h2>
                 <p class="game-instructions">把行星拖到正確的軌道位置上！</p>
-                <div id="solar-system-game" style="position: relative; height: 400px; background: radial-gradient(circle at center, #ffd700 0%, #ff8c00 20%, transparent 40%), #0a0a20; border-radius: 20px; overflow: hidden;">
+                <div id="solar-system-game" style="position: relative; height: 650px; background: radial-gradient(circle at center, #ffd700 0%, #ff8c00 25%, transparent 50%), #0a0a20; border-radius: 20px; overflow: hidden; display: flex; align-items: center; justify-content: center;">
                     <div id="sun" style="position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); font-size: 4rem;">☀️</div>
                     <div id="planets-container"></div>
                     <div id="orbits-info" style="position: absolute; bottom: 10px; left: 10px; color: white; font-size: 0.9rem;"></div>
@@ -126,14 +126,22 @@
 
         function initSolarSystemGame() {
             const planets = [
-                { name: '水星', emoji: '🤍', color: '#b5b5b5', orbit: 60 },
-                { name: '金星', emoji: '🟡', color: '#e6c87a', orbit: 90 },
-                { name: '地球', emoji: '🔵', color: '#6b93d6', orbit: 120 },
-                { name: '火星', emoji: '🔴', color: '#c1440e', orbit: 150 },
-                { name: '木星', emoji: '🟤', color: '#d8ca9d', orbit: 190 },
-                { name: '土星', emoji: '🟠', color: '#f4d59e', orbit: 230 },
-                { name: '天王星', emoji: '🔵', color: '#d1e7e7', orbit: 270 },
-                { name: '海王星', emoji: '🔵', color: '#5b5ddf', orbit: 310 }
+                // 水星：灰色、最小、最靠近太陽
+                { name: '水星', emoji: '☿', color: '#9e9e9e', orbit: 55, size: 18 },
+                // 金星：橙黃色、第二近
+                { name: '金星', emoji: '♀', color: '#e6c87a', orbit: 80, size: 26 },
+                // 地球：藍綠色、我們的家
+                { name: '地球', emoji: '🌍', color: '#4a90d9', orbit: 105, size: 28 },
+                // 火星：紅色
+                { name: '火星', emoji: '♂', color: '#c1440e', orbit: 130, size: 22 },
+                // 木星：棕橘色條紋、最大
+                { name: '木星', emoji: '♃', color: '#d8ca9d', orbit: 165, size: 48 },
+                // 土星：淡黃色+環
+                { name: '土星', emoji: '♄', color: '#f4d59e', orbit: 205, size: 42, hasRing: true },
+                // 天王星：青綠色、側躺
+                { name: '天王星', emoji: '⛢', color: '#7de3e3', orbit: 245, size: 34 },
+                // 海王星：深藍色、最遠
+                { name: '海王星', emoji: '♆', color: '#5b5ddf', orbit: 285, size: 32 }
             ];
 
             const tray = document.getElementById('planet-tray');
@@ -150,14 +158,23 @@
                 planetEl.className = 'planet';
                 planetEl.dataset.name = planet.name;
                 planetEl.dataset.order = index;
+                
+                // 土星特殊處理（加上光環）
+                let ringHTML = '';
+                if (planet.hasRing) {
+                    ringHTML = `<div style="position: absolute; width: ${planet.size * 2.2}px; height: ${planet.size * 0.8}px; border: 3px solid #c9a86c; border-radius: 50%; top: 50%; left: 50%; transform: translate(-50%, -50%) rotateX(70deg); pointer-events: none;"></div>`;
+                }
+                
                 planetEl.style.cssText = `
-                    width: 50px; height: 50px; border-radius: 50%;
+                    width: ${planet.size}px; height: ${planet.size}px; border-radius: 50%;
                     background: ${planet.color}; cursor: grab;
                     display: flex; align-items: center; justify-content: center;
-                    font-size: 1.8rem; position: relative;
+                    font-size: ${planet.size * 0.7}rem; position: relative;
                     box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+                    flex-direction: column;
                 `;
-                planetEl.innerHTML = planet.emoji;
+                // 行星 + 中文名稱標籤
+                planetEl.innerHTML = `<span>${planet.emoji}</span><span style="font-size:0.55rem; color:white; text-shadow:0 0 3px black; margin-top:2px;">${planet.name}</span>${ringHTML}`;
                 
                 ScienceGame.enableDrag(planetEl, (el) => {
                     const sun = document.getElementById('sun');
@@ -196,17 +213,37 @@
                 tray.appendChild(planetEl);
             });
 
-            // 繪製軌道線
-            planets.forEach(planet => {
+            // 繪製8條軌道線（每條都有行星名稱標註）
+            const orbitLabels = ['水星軌道', '金星軌道', '地球軌道', '火星軌道', '木星軌道', '土星軌道', '天王星軌道', '海王星軌道'];
+            planets.forEach((planet, idx) => {
                 const orbit = document.createElement('div');
                 orbit.style.cssText = `
                     position: absolute; left: 50%; top: 50%;
                     transform: translate(-50%, -50%);
                     width: ${planet.orbit * 2}px; height: ${planet.orbit * 2}px;
-                    border: 1px dashed rgba(255,255,255,0.2); border-radius: 50%;
+                    border: 1px dashed rgba(255,255,255,0.25); border-radius: 50%;
                     pointer-events: none;
                 `;
                 container.appendChild(orbit);
+                
+                // 在軌道旁邊標示行星名稱
+                const label = document.createElement('div');
+                const labelAngle = (idx * 45 - 90) * Math.PI / 180;
+                const labelRadius = planet.orbit + 18;
+                const labelX = 200 + labelRadius * Math.cos(labelAngle);
+                const labelY = 200 + labelRadius * Math.sin(labelAngle);
+                label.style.cssText = `
+                    position: absolute;
+                    left: ${labelX}px; top: ${labelY}px;
+                    transform: translate(-50%, -50%);
+                    color: rgba(255,255,255,0.5);
+                    font-size: 0.6rem;
+                    pointer-events: none;
+                    font-family: 'Noto Sans TC', sans-serif;
+                    white-space: nowrap;
+                `;
+                label.textContent = orbitLabels[idx];
+                container.appendChild(label);
             });
 
             orbitsInfo.innerHTML = '📍 將行星拖放到正確的軌道位置';
