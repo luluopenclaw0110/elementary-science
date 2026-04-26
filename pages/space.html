@@ -169,12 +169,12 @@
                     width: ${planet.size}px; height: ${planet.size}px; border-radius: 50%;
                     background: ${planet.color}; cursor: grab;
                     display: flex; align-items: center; justify-content: center;
-                    font-size: ${planet.size * 0.7}rem; position: relative;
+                    font-size: ${planet.size * 0.25}rem; float: left;
                     box-shadow: 0 4px 15px rgba(0,0,0,0.3);
                     flex-direction: column;
                 `;
                 // 行星 + 中文名稱標籤
-                planetEl.innerHTML = `<span style="font-size:${planet.size*0.5}rem; color:white; text-shadow:0 0 3px black;">${planet.name}</span>${ringHTML}`;
+                planetEl.innerHTML = `<span style="font-size:${planet.size*0.15}rem;">${planet.emoji}</span><span style="font-size:0.5rem; color:white; text-shadow:0 0 2px black; margin-top:1px;">${planet.name}</span>${ringHTML}`;
                 
                 ScienceGame.enableDrag(planetEl, (el) => {
                     const sun = document.getElementById('sun');
@@ -214,7 +214,7 @@
             });
 
             // 繪製8條軌道線（每條都有行星名稱標註）
-            const orbitLabels = ['水星', '金星', '地球', '火星', '木星', '土星', '天王星', '海王星'];
+
             planets.forEach((planet, idx) => {
                 const orbit = document.createElement('div');
                 orbit.style.cssText = `
@@ -227,25 +227,7 @@
                 container.appendChild(orbit);
                 
                 // 在軌道旁邊標示行星名稱
-                const label = document.createElement('div');
-                const labelAngle = (idx * 45) * Math.PI / 180;
-                const labelRadius = planet.orbit + 22;
-                const labelX = 400 + labelRadius * Math.cos(labelAngle);
-                const labelY = 400 + labelRadius * Math.sin(labelAngle);
-                label.style.cssText = `
-                    position: absolute;
-                    left: ${labelX}px; top: ${labelY}px;
-                    transform: translate(-50%, -50%);
-                    color: white;
-                    font-size: 0.75rem;
-                    font-weight: bold;
-                    pointer-events: none;
-                    font-family: 'Noto Sans TC', sans-serif;
-                    white-space: nowrap;
-                    text-shadow: 0 0 4px rgba(0,0,0,0.8);
-                `;
-                label.textContent = orbitLabels[idx];
-                container.appendChild(label);
+
             });
 
             orbitsInfo.innerHTML = '📍 將行星拖放到正確的軌道位置';
@@ -359,7 +341,7 @@
                 <h2 class="game-title">🌙 月相變化</h2>
                 <p class="game-instructions">拖動月亮，體驗一個月內月相的變化！完成所有月相後過關！</p>
                 <div id="moon-phase-game" style="text-align: center; padding: 20px;">
-                    <div style="background: linear-gradient(to bottom, #0a0a30 0%, #1a1a60 100%); border-radius: 20px; padding: 40px; position: relative;">
+                    <div style="background: linear-gradient(to bottom, #0a0a30 0%, #1a1a60 100%); border-radius: 20px; padding: 40px; float: left;">
                         <div id="moon-view" style="font-size: 8rem; margin: 20px 0; transition: all 0.5s;">🌑</div>
                         <div id="moon-label" style="color: white; font-size: 1.5rem; margin-bottom: 20px;">新月</div>
                         <input type="range" id="moon-slider" min="0" max="7" value="0" style="width: 80%;">
